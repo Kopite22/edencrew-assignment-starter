@@ -40,6 +40,8 @@ dependencies:
   dio: ^5.11.1
   flutter_riverpod: ^3.4.3
   shared_preferences: ^2.5.5
+  html: ^0.15.7
+  charset_converter: ^2.5.1
 
 dev_dependencies:
   flutter_test:
