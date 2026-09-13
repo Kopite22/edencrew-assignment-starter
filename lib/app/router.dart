@@ -120,7 +120,7 @@ final router = GoRouter(
       ],
     ),
 
-    // ⭐ 종목 상세
+    // 종목 상세
     GoRoute(
       path: '/stock/:stockCode',
       builder: (context, state) {
