@@ -24,30 +24,38 @@ class AppToast {
           ),
           padding: EdgeInsets.zero,
           duration: const Duration(seconds: 2),
-          content: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: dimens.space4,
-              vertical: dimens.space3,
-            ),
-            decoration: BoxDecoration(
-              color: colors.surfaceOverlay,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              spacing: dimens.space2,
-              children: [
-                icon,
-                Expanded(
-                  child: Text(
-                    message,
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 13,
-                      height: 18 / 13,
+          content: TweenAnimationBuilder<Offset>(
+            tween: Tween(begin: const Offset(0, 1), end: Offset.zero),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            builder: (context, offset, child) {
+              return FractionalTranslation(translation: offset, child: child);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: dimens.space4,
+                vertical: dimens.space3,
+              ),
+              decoration: BoxDecoration(
+                color: colors.surfaceOverlay,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                spacing: dimens.space2,
+                children: [
+                  icon,
+                  Expanded(
+                    child: Text(
+                      message,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 13,
+                        height: 18 / 13,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
