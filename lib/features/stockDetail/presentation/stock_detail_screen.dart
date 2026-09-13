@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,16 +7,22 @@ import 'package:edencrew_assignment_starter/theme/theme.dart';
 import 'package:edencrew_assignment_starter/core/network/dio_client.dart';
 import 'package:edencrew_assignment_starter/data/stock/stock_metadata_api.dart';
 import 'package:edencrew_assignment_starter/data/stock/models/stock_metadata.dart';
+import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
 
-class StockDetailScreen extends StatelessWidget {
+class StockDetailScreen extends ConsumerWidget {
   const StockDetailScreen({super.key, required this.stockCode});
 
   final String stockCode;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppColors colors = context.colors;
     final AppDimens dimens = context.dimens;
+
+    final interests = ref.watch(favoriteStocksProvider);
+
+    final isInterested =
+        interests.value?.any((stock) => stock.code == stockCode) ?? false;
 
     final api = StockMetadataApi(DioClient.instance.dio);
 
@@ -74,18 +81,20 @@ class StockDetailScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(right: dimens.space4),
             child: SvgPicture.asset(
-              'assets/icons/ico_starFill.svg',
+              isInterested
+                  ? 'assets/icons/ico_starFill.svg'
+                  : 'assets/icons/ico_star.svg',
               width: 22,
               height: 22,
               colorFilter: ColorFilter.mode(
-                colors.favoriteActive,
+                isInterested ? colors.favoriteActive : colors.textSecondary,
                 BlendMode.srcIn,
               ),
             ),
           ),
         ],
       ),
-      body: Center(child: Text('$stockCode 종목 상세 화면')),
+      // ...
     );
   }
 }
