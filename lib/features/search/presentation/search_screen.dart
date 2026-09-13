@@ -7,7 +7,7 @@ import 'package:edencrew_assignment_starter/core/network/dio_client.dart';
 import 'package:edencrew_assignment_starter/features/search/data/stock_repository.dart';
 import 'package:edencrew_assignment_starter/features/search/models/stock.dart';
 import 'package:edencrew_assignment_starter/features/search/presentation/widgets/search_app_bar.dart';
-import 'package:edencrew_assignment_starter/shared/widgets/empty_content.dart';
+import 'package:edencrew_assignment_starter/core/widgets/empty_content.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SearchScreen extends StatefulWidget {

@@ -9,7 +9,7 @@ import 'package:edencrew_assignment_starter/features/favorite/models/stock_price
 import 'package:edencrew_assignment_starter/features/favorite/presentation/widgets/favorite_app_bar.dart';
 import 'package:edencrew_assignment_starter/features/favorite/presentation/widgets/favorite_stock_item.dart';
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
-import 'package:edencrew_assignment_starter/shared/widgets/empty_content.dart';
+import 'package:edencrew_assignment_starter/core/widgets/empty_content.dart';
 
 import 'widgets/sort_bottom_sheet.dart';
 

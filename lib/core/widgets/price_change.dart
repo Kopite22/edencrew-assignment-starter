@@ -1,4 +1,4 @@
-import 'package:edencrew_assignment_starter/shared/utils/number_formatter.dart';
+import 'package:edencrew_assignment_starter/core/utils/number_formatter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:edencrew_assignment_starter/theme/theme.dart';

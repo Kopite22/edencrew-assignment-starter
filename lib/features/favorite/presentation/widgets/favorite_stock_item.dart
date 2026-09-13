@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:edencrew_assignment_starter/shared/utils/number_formatter.dart';
+import 'package:edencrew_assignment_starter/core/utils/number_formatter.dart';
 import 'package:edencrew_assignment_starter/theme/theme.dart';
 import 'package:edencrew_assignment_starter/features/favorite/models/stock_price.dart';
-import 'package:edencrew_assignment_starter/shared/widgets/price_change.dart';
+import 'package:edencrew_assignment_starter/core/widgets/price_change.dart';
 
 class FavoriteStockItem extends StatelessWidget {
   final String name;
