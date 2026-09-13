@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:edencrew_assignment_starter/features/favorite/models/favorite_stock.dart';
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
@@ -39,34 +40,45 @@ class SearchStockItem extends ConsumerWidget {
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        spacing: dimens.space3,
         children: [
           Expanded(
-            child: Column(
-              spacing: 2,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHighlightedTitle(colors),
-                Text(
-                  '${stock.code} · ${stock.typeName}',
-                  style: TextStyle(
-                    color: colors.textSecondary,
-                    fontSize: 11,
-                    height: 14 / 11,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                context.push('/stock/${stock.code}');
+              },
+              child: Row(
+                spacing: dimens.space3,
+                children: [
+                  Expanded(
+                    child: Column(
+                      spacing: 2,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHighlightedTitle(colors),
+                        Text(
+                          '${stock.code} · ${stock.typeName}',
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: 11,
+                            height: 14 / 11,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
+
           IconButton(
             onPressed: () {
               final notifier = ref.read(favoriteStocksProvider.notifier);
 
               if (isInterested) {
-                // 관심 해제
                 notifier.remove(stock.code);
               } else {
-                // 관심 등록
                 notifier.add(
                   FavoriteStock(
                     code: stock.code,
