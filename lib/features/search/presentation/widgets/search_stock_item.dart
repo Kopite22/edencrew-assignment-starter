@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:edencrew_assignment_starter/core/widgets/app_toast.dart';
+import 'package:edencrew_assignment_starter/core/widgets/stock_name_info.dart';
 import 'package:edencrew_assignment_starter/features/favorite/models/favorite_stock.dart';
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
 import 'package:edencrew_assignment_starter/features/search/models/stock.dart';
@@ -52,20 +53,10 @@ class SearchStockItem extends ConsumerWidget {
                 spacing: dimens.space3,
                 children: [
                   Expanded(
-                    child: Column(
-                      spacing: 2,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildHighlightedTitle(colors),
-                        Text(
-                          '${stock.code} · ${stock.typeName}',
-                          style: TextStyle(
-                            color: colors.textSecondary,
-                            fontSize: 11,
-                            height: 14 / 11,
-                          ),
-                        ),
-                      ],
+                    child: StockNameInfo(
+                      stock: stock,
+                      keyword: keyword,
+                      highlightKeyword: true,
                     ),
                   ),
                 ],
@@ -79,6 +70,7 @@ class SearchStockItem extends ConsumerWidget {
 
               if (isInterested) {
                 notifier.remove(stock.code);
+
                 AppToast.show(
                   context,
                   message: '관심이 해제되었습니다.',
@@ -96,6 +88,7 @@ class SearchStockItem extends ConsumerWidget {
                     typeName: stock.typeName,
                   ),
                 );
+
                 AppToast.show(
                   context,
                   message: '관심이 등록되었습니다.',
@@ -122,42 +115,6 @@ class SearchStockItem extends ConsumerWidget {
                   : null,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHighlightedTitle(AppColors colors) {
-    final style = TextStyle(
-      color: colors.textPrimary,
-      fontSize: 15,
-      fontWeight: AppTypography.medium,
-      height: 20 / 15,
-      letterSpacing: -0.1,
-    );
-
-    if (keyword.isEmpty) {
-      return Text(stock.name, style: style);
-    }
-
-    final index = stock.name.toLowerCase().indexOf(keyword.toLowerCase());
-
-    if (index == -1) {
-      return Text(stock.name, style: style);
-    }
-
-    final matchedEnd = index + keyword.length;
-
-    return Text.rich(
-      TextSpan(
-        style: style,
-        children: [
-          TextSpan(text: stock.name.substring(0, index)),
-          TextSpan(
-            text: stock.name.substring(index, matchedEnd),
-            style: style.copyWith(color: colors.accentDefault),
-          ),
-          TextSpan(text: stock.name.substring(matchedEnd)),
         ],
       ),
     );
