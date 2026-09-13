@@ -6,6 +6,7 @@ import 'package:edencrew_assignment_starter/theme/theme.dart';
 
 import 'package:edencrew_assignment_starter/features/favorite/presentation/favorite_screen.dart';
 import 'package:edencrew_assignment_starter/features/search/presentation/search_screen.dart';
+import 'package:edencrew_assignment_starter/features/stockDetail/presentation/stock_detail_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/favorite',
@@ -19,11 +20,9 @@ final router = GoRouter(
 
         return Scaffold(
           body: navigationShell,
-
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               color: colors.surfaceRaised,
-
               border: Border(
                 top: BorderSide(color: colors.borderSubtle, width: 1),
               ),
@@ -60,7 +59,6 @@ final router = GoRouter(
                       ),
                     ),
 
-                    // 검색
                     Expanded(
                       child: GestureDetector(
                         onTap: () => navigationShell.goBranch(1),
@@ -96,6 +94,7 @@ final router = GoRouter(
       },
 
       branches: [
+        // 관심
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -107,6 +106,7 @@ final router = GoRouter(
           ],
         ),
 
+        // 검색
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -118,6 +118,16 @@ final router = GoRouter(
           ],
         ),
       ],
+    ),
+
+    // ⭐ 종목 상세
+    GoRoute(
+      path: '/stock/:stockCode',
+      builder: (context, state) {
+        final stockCode = state.pathParameters['stockCode']!;
+
+        return StockDetailScreen(stockCode: stockCode);
+      },
     ),
   ],
 );
