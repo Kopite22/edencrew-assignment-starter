@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:edencrew_assignment_starter/core/widgets/app_toast.dart';
 import 'package:edencrew_assignment_starter/features/favorite/models/favorite_stock.dart';
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
 import 'package:edencrew_assignment_starter/features/search/models/stock.dart';
@@ -78,12 +79,34 @@ class SearchStockItem extends ConsumerWidget {
 
               if (isInterested) {
                 notifier.remove(stock.code);
+                AppToast.show(
+                  context,
+                  message: '관심이 해제되었습니다.',
+                  icon: SvgPicture.asset(
+                    'assets/icons/ico_star.svg',
+                    width: 18,
+                    height: 18,
+                  ),
+                );
               } else {
                 notifier.add(
                   FavoriteStock(
                     code: stock.code,
                     name: stock.name,
                     typeName: stock.typeName,
+                  ),
+                );
+                AppToast.show(
+                  context,
+                  message: '관심이 등록되었습니다.',
+                  icon: SvgPicture.asset(
+                    'assets/icons/ico_starFill.svg',
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      colors.favoriteActive,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 );
               }
