@@ -59,18 +59,42 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
     switch (_sortType) {
       case SortType.currentPrice:
         sorted.sort((a, b) {
-          final priceA = priceMap[a.code]?.nv ?? 0;
-          final priceB = priceMap[b.code]?.nv ?? 0;
+          final priceA = priceMap[a.code];
+          final priceB = priceMap[b.code];
 
-          return priceB.compareTo(priceA);
+          if (priceA == null && priceB != null) {
+            return 1;
+          }
+
+          if (priceA != null && priceB == null) {
+            return -1;
+          }
+
+          if (priceA == null && priceB == null) {
+            return 0;
+          }
+
+          return (priceB!.nv ?? 0).compareTo(priceA!.nv ?? 0);
         });
 
       case SortType.changeRate:
         sorted.sort((a, b) {
-          final rateA = priceMap[a.code]?.changeRate ?? 0;
-          final rateB = priceMap[b.code]?.changeRate ?? 0;
+          final priceA = priceMap[a.code];
+          final priceB = priceMap[b.code];
 
-          return rateB.compareTo(rateA);
+          if (priceA == null && priceB != null) {
+            return 1;
+          }
+
+          if (priceA != null && priceB == null) {
+            return -1;
+          }
+
+          if (priceA == null && priceB == null) {
+            return 0;
+          }
+
+          return (priceB!.changeRate ?? 0).compareTo(priceA!.changeRate ?? 0);
         });
 
       case SortType.name:
@@ -103,11 +127,9 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
               child: CircularProgressIndicator(color: colors.textSecondary),
             );
           },
-
           error: (error, stack) {
             return const Center(child: Text('관심 종목을 불러오지 못했습니다.'));
           },
-
           data: (stocks) {
             if (stocks.isEmpty) {
               return EmptyContent(
@@ -141,7 +163,6 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                     },
                   );
                 },
-
                 error: (error, stack) {
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -153,7 +174,6 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                     ],
                   );
                 },
-
                 data: (priceMap) {
                   final sortedStocks = _sortStocks(stocks, priceMap);
 
@@ -162,7 +182,6 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
                     itemCount: sortedStocks.length,
                     itemBuilder: (context, index) {
                       final favorite = sortedStocks[index];
-
                       final price = priceMap[favorite.code];
 
                       return FavoriteStockItem(
