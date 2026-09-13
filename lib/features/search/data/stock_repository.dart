@@ -31,11 +31,6 @@ class StockRepository {
   }
 
   Stock _toStock(StockSearchItem item) {
-    return Stock(
-      id: 'domestic:${item.code}',
-      code: item.code,
-      name: item.name,
-      typeName: item.typeName,
-    );
+    return Stock(code: item.code, name: item.name, typeName: item.typeName);
   }
 }

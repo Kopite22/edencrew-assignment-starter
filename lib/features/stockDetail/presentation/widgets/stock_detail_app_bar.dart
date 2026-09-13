@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:edencrew_assignment_starter/core/widgets/stock_name_info.dart';
+import 'package:edencrew_assignment_starter/features/search/models/stock.dart';
 import 'package:edencrew_assignment_starter/theme/theme.dart';
 
 class StockDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -41,24 +43,12 @@ class StockDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: SizedBox(
         width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              stockName,
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 15,
-                fontWeight: AppTypography.medium,
-                height: 20 / 15,
-              ),
-            ),
-            Text(
-              '$symbolCode · $stockExchangeNameKor',
-              style: TextStyle(color: colors.textSecondary, fontSize: 11),
-            ),
-          ],
+        child: StockNameInfo(
+          stock: Stock(
+            code: symbolCode,
+            name: stockName,
+            typeName: stockExchangeNameKor,
+          ),
         ),
       ),
       actions: [
