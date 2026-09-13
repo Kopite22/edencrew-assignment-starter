@@ -12,6 +12,7 @@ import 'package:edencrew_assignment_starter/features/favorite/presentation/widge
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
 import 'package:edencrew_assignment_starter/core/widgets/empty_content.dart';
 
+import 'widgets/favorite_refresh_indicator.dart';
 import 'widgets/sort_bottom_sheet.dart';
 
 class FavoriteScreen extends ConsumerStatefulWidget {
@@ -24,7 +25,6 @@ class FavoriteScreen extends ConsumerStatefulWidget {
 class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
   SortType _sortType = SortType.name;
 
-  /// 정렬 기준 선택 BottomSheet
   Future<void> _showSortBottomSheet() async {
     final colors = context.colors;
 
@@ -44,12 +44,12 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
     });
   }
 
-  /// 시세 새로고침
   Future<void> _refreshPrices() async {
     ref.invalidate(stockPricesProvider);
+
+    await ref.read(stockPricesProvider.future);
   }
 
-  /// 관심 종목 정렬
   List<FavoriteStock> _sortStocks(
     List<FavoriteStock> stocks,
     Map<String, StockPrice> priceMap,
@@ -84,41 +84,31 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    /// 관심 종목 목록
-    final favorites = ref.watch(favoriteStocksProvider);
+    final AppColors colors = context.colors;
 
-    /// 관심 종목의 현재 시세
+    final favorites = ref.watch(favoriteStocksProvider);
     final prices = ref.watch(stockPricesProvider);
 
     return Scaffold(
       appBar: FavoriteAppBar(
         sortType: _sortType,
-
-        /// 정렬 버튼
         onSortTap: _showSortBottomSheet,
-
-        /// 새로고침 버튼
         onRefreshTap: _refreshPrices,
-
-        /// 시세 조회 중이면 새로고침 버튼 비활성화
         isRefreshing: prices.isLoading,
       ),
-
       body: SafeArea(
         child: favorites.when(
-          /// 관심 종목 목록 조회 중
           loading: () {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: colors.textSecondary),
+            );
           },
 
-          /// 관심 종목 목록 조회 실패
           error: (error, stack) {
             return const Center(child: Text('관심 종목을 불러오지 못했습니다.'));
           },
 
-          /// 관심 종목 목록 조회 성공
           data: (stocks) {
-            /// 관심 종목이 없는 경우
             if (stocks.isEmpty) {
               return EmptyContent(
                 icon: SvgPicture.asset(
@@ -131,52 +121,61 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
               );
             }
 
-            /// 관심 종목은 있지만 시세를 가져오는 중
-            return prices.when(
-              loading: () {
-                return ListView.builder(
-                  itemCount: stocks.length,
-                  itemBuilder: (context, index) {
-                    final favorite = stocks[index];
+            return FavoriteRefreshIndicator(
+              onRefresh: _refreshPrices,
+              child: prices.when(
+                loading: () {
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: stocks.length,
+                    itemBuilder: (context, index) {
+                      final favorite = stocks[index];
 
-                    return FavoriteStockItem(
-                      name: favorite.name,
-                      code: favorite.code,
-                      typeName: favorite.typeName,
-                      stock: null,
-                      isLoading: true,
-                    );
-                  },
-                );
-              },
+                      return FavoriteStockItem(
+                        name: favorite.name,
+                        code: favorite.code,
+                        typeName: favorite.typeName,
+                        stock: null,
+                        isLoading: true,
+                      );
+                    },
+                  );
+                },
 
-              /// 시세 조회 실패
-              error: (error, stack) {
-                return const Center(child: Text('시세를 불러오지 못했습니다.'));
-              },
+                error: (error, stack) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(
+                        height: 300,
+                        child: Center(child: Text('시세를 불러오지 못했습니다.')),
+                      ),
+                    ],
+                  );
+                },
 
-              /// 시세 조회 성공
-              data: (priceMap) {
-                /// 현재 선택된 정렬 기준으로 정렬
-                final sortedStocks = _sortStocks(stocks, priceMap);
+                data: (priceMap) {
+                  final sortedStocks = _sortStocks(stocks, priceMap);
 
-                return ListView.builder(
-                  itemCount: sortedStocks.length,
-                  itemBuilder: (context, index) {
-                    final favorite = sortedStocks[index];
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: sortedStocks.length,
+                    itemBuilder: (context, index) {
+                      final favorite = sortedStocks[index];
 
-                    final price = priceMap[favorite.code];
+                      final price = priceMap[favorite.code];
 
-                    return FavoriteStockItem(
-                      name: favorite.name,
-                      code: favorite.code,
-                      stock: price,
-                      isLoading: price == null,
-                      typeName: favorite.typeName,
-                    );
-                  },
-                );
-              },
+                      return FavoriteStockItem(
+                        name: favorite.name,
+                        code: favorite.code,
+                        stock: price,
+                        isLoading: price == null,
+                        typeName: favorite.typeName,
+                      );
+                    },
+                  );
+                },
+              ),
             );
           },
         ),
