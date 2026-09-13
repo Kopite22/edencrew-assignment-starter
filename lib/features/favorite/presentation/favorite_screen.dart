@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:edencrew_assignment_starter/theme/theme.dart';
 
 import 'package:edencrew_assignment_starter/features/favorite/models/favorite_stock.dart';
@@ -11,6 +12,7 @@ import 'package:edencrew_assignment_starter/features/favorite/presentation/widge
 import 'package:edencrew_assignment_starter/features/favorite/providers/favorite_stocks_provider.dart';
 import 'package:edencrew_assignment_starter/core/widgets/empty_content.dart';
 
+import 'widgets/favorite_refresh_indicator.dart';
 import 'widgets/sort_bottom_sheet.dart';
 
 class FavoriteScreen extends ConsumerStatefulWidget {
@@ -40,6 +42,12 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
     setState(() {
       _sortType = result;
     });
+  }
+
+  Future<void> _refreshPrices() async {
+    ref.invalidate(stockPricesProvider);
+
+    await ref.read(stockPricesProvider.future);
   }
 
   List<FavoriteStock> _sortStocks(
@@ -76,6 +84,8 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppColors colors = context.colors;
+
     final favorites = ref.watch(favoriteStocksProvider);
     final prices = ref.watch(stockPricesProvider);
 
@@ -83,12 +93,15 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
       appBar: FavoriteAppBar(
         sortType: _sortType,
         onSortTap: _showSortBottomSheet,
-        onRefreshTap: () {},
+        onRefreshTap: _refreshPrices,
+        isRefreshing: prices.isLoading,
       ),
       body: SafeArea(
         child: favorites.when(
           loading: () {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: colors.textSecondary),
+            );
           },
 
           error: (error, stack) {
@@ -108,48 +121,61 @@ class _FavoriteScreenState extends ConsumerState<FavoriteScreen> {
               );
             }
 
-            return prices.when(
-              loading: () {
-                return ListView.builder(
-                  itemCount: stocks.length,
-                  itemBuilder: (context, index) {
-                    final favorite = stocks[index];
+            return FavoriteRefreshIndicator(
+              onRefresh: _refreshPrices,
+              child: prices.when(
+                loading: () {
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: stocks.length,
+                    itemBuilder: (context, index) {
+                      final favorite = stocks[index];
 
-                    return FavoriteStockItem(
-                      name: favorite.name,
-                      code: favorite.code,
-                      typeName: favorite.typeName,
-                      stock: null,
-                      isLoading: true,
-                    );
-                  },
-                );
-              },
+                      return FavoriteStockItem(
+                        name: favorite.name,
+                        code: favorite.code,
+                        typeName: favorite.typeName,
+                        stock: null,
+                        isLoading: true,
+                      );
+                    },
+                  );
+                },
 
-              error: (error, stack) {
-                return const Center(child: Text('시세를 불러오지 못했습니다.'));
-              },
+                error: (error, stack) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(
+                        height: 300,
+                        child: Center(child: Text('시세를 불러오지 못했습니다.')),
+                      ),
+                    ],
+                  );
+                },
 
-              data: (priceMap) {
-                final sortedStocks = _sortStocks(stocks, priceMap);
+                data: (priceMap) {
+                  final sortedStocks = _sortStocks(stocks, priceMap);
 
-                return ListView.builder(
-                  itemCount: sortedStocks.length,
-                  itemBuilder: (context, index) {
-                    final favorite = sortedStocks[index];
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: sortedStocks.length,
+                    itemBuilder: (context, index) {
+                      final favorite = sortedStocks[index];
 
-                    final price = priceMap[favorite.code];
+                      final price = priceMap[favorite.code];
 
-                    return FavoriteStockItem(
-                      name: favorite.name,
-                      code: favorite.code,
-                      stock: price,
-                      isLoading: price == null,
-                      typeName: favorite.typeName,
-                    );
-                  },
-                );
-              },
+                      return FavoriteStockItem(
+                        name: favorite.name,
+                        code: favorite.code,
+                        stock: price,
+                        isLoading: price == null,
+                        typeName: favorite.typeName,
+                      );
+                    },
+                  );
+                },
+              ),
             );
           },
         ),

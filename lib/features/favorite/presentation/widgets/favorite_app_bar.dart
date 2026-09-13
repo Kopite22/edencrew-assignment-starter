@@ -8,12 +8,14 @@ class FavoriteAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SortType sortType;
   final VoidCallback onSortTap;
   final VoidCallback onRefreshTap;
+  final bool isRefreshing;
 
   const FavoriteAppBar({
     super.key,
     required this.sortType,
     required this.onSortTap,
     required this.onRefreshTap,
+    required this.isRefreshing,
   });
 
   @override
@@ -59,13 +61,20 @@ class FavoriteAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           ),
         ),
+
         IconButton(
-          onPressed: onRefreshTap,
-          icon: SvgPicture.asset(
-            'assets/icons/ico_refresh.svg',
-            width: 20,
-            height: 20,
-          ),
+          onPressed: isRefreshing ? null : onRefreshTap,
+          icon: isRefreshing
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : SvgPicture.asset(
+                  'assets/icons/ico_refresh.svg',
+                  width: 20,
+                  height: 20,
+                ),
         ),
       ],
     );
